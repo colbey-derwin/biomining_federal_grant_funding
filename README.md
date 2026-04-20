@@ -125,7 +125,7 @@ python scripts/grant_classifier/step2_mining_filter_multiyear.py
 
 Plus two additions from the climate_biotech pattern:
 - **Flag (not drop)** `is_formula_grant` when `award_type == "FORMULA GRANT (A)"` — formula grants pass through to the LLM with a reduced Stage-2-Formula pass (biological + bio_subcategory only) so the Sankey's Formula Grants panel stays populated
-- **Drop** rows with `abstract` < 92 characters (below LLM-classifiable context)
+- **Route short-abstract grants to a separate file** when `abstract` < 92 characters — they drop out of the main LLM-ready pool but are preserved in `mining_insufficient_abstract_all_years.csv` and classified downstream in step 3 via a dedicated **Stage 2-Short** pass (bio flag only; the abstract is too thin for full 6-axis classification)
 
 **Outputs** (in `scripts/grant_classifier/output/`):
 - `mining_filtered_all_years.csv` — LLM-ready pool (kept + formula, with sufficient abstracts)
@@ -143,13 +143,14 @@ Plus two additions from the climate_biotech pattern:
 python scripts/grant_classifier/step3_mining_two_stage_classifier_multiyear.py
 ```
 
-**Three-path architecture**:
+**Four-path architecture**:
 
 | Stage | Model | Batch | Runs on | Output |
 |---|---|---|---|---|
-| **Stage 1** | Claude Haiku 4.5 | 20 | All step2-kept grants | `keep`, `confidence`, `remove_reason` |
-| **Stage 2-Formula** | Claude Haiku 4.5 | 20 | Kept formula grants only | `biological`, `bio_subcategory`, `confidence` |
+| **Stage 1** | Claude Haiku 4.5 | 20 | All step2-kept grants (sufficient abstracts) | `keep`, `confidence`, `remove_reason` |
+| **Stage 2-Formula** | Claude Haiku 4.5 | 20 | Kept formula grants | `biological`, `bio_subcategory`, `confidence` |
 | **Stage 2-Full** | Claude Sonnet 4 | 10 | Kept non-formula grants | all 6 axes |
+| **Stage 2-Short** | Claude Haiku 4.5 | 20 | Non-formula grants with abstracts < 92 chars (from step 2's insufficient-abstract pool) | `biological`, `bio_subcategory`, `confidence` — other axes intentionally left null (not determinable from a short abstract) |
 
 **Prompts**: preserved verbatim from the old biomining classifier — ~100 calibration examples, all axis definitions, all hard filters. The only adaptation is that hard filters keyed on `query_used` were rephrased to trigger on abstract text (the bulk pipeline has no `query_used` column). Orientation uses an explicit decision tree (SBIR/STTR → industry_facing, University/College → public_good, etc.) ported from climate_biotech step3 so no post-classification manual correction is needed.
 
@@ -178,13 +179,15 @@ python scripts/grant_classifier/step3_mining_two_stage_classifier_multiyear.py
 - `stage1_review_all_years.csv` — Stage 1 low-confidence
 - `stage2_formula_all_years.csv` — Stage 2-Formula results
 - `stage2_full_all_years.csv` — Stage 2-Full results
-- `mining_llm_classified_all_years.csv` — **merged final** (all three branches unified)
+- `stage2_short_abstract_all_years.csv` — Stage 2-Short results (bio flag only, short abstracts)
+- `mining_llm_classified_all_years.csv` — **merged final** (all four branches unified)
 - `two_stage_classification_log_all_years.json` — raw LLM responses
 
 **Runtime (full dataset)**: ~4–8 hours.
 **Cost estimate** (for ~10,000 grants full run):
 - Stage 1: ~$0.001/grant × 10K = ~$10
 - Stage 2-Formula: ~$0.001/formula-grant × ~200 = ~$0.20
+- Stage 2-Short: ~$0.001/short-abstract-grant × ~1.5K = ~$1.50
 - Stage 2-Full: ~$0.01/grant × ~1K kept non-formula = ~$10
 - Total: **~$20–30** (varies with actual kept count)
 
@@ -277,6 +280,7 @@ biomining_federal_grant_funding/
 │       │   ├── stage1_review_all_years.csv
 │       │   ├── stage2_formula_all_years.csv
 │       │   ├── stage2_full_all_years.csv
+│       │   ├── stage2_short_abstract_all_years.csv
 │       │   ├── mining_llm_classified_all_years.csv
 │       │   ├── mining_llm_classified_with_keyword_flags_all_years.csv    # FINAL
 │       │   └── two_stage_classification_log_all_years.json
@@ -417,7 +421,8 @@ See `analyze years` below. Some grants have project `startDate` before 2016 or a
 | Stage | Model | Version | Purpose | Cost/grant | Typical speed |
 |---|---|---|---|---|---|
 | Stage 1 | Claude Haiku | 4.5 (Oct 2025) | Binary KEEP/REMOVE | ~$0.001 | ~1–2 sec |
-| Stage 2-Formula | Claude Haiku | 4.5 | biological + bio_subcategory only | ~$0.001 | ~1–2 sec |
+| Stage 2-Formula | Claude Haiku | 4.5 | biological + bio_subcategory only (formula grants) | ~$0.001 | ~1–2 sec |
+| Stage 2-Short | Claude Haiku | 4.5 | biological + bio_subcategory only (non-formula grants with < 92-char abstracts) | ~$0.001 | ~1–2 sec |
 | Stage 2-Full | Claude Sonnet | 4 (May 2025) | 6-axis classification | ~$0.01 | ~2–3 sec |
 
 Per-grant cost depends on how much Stage 2 work is needed. On a ~10K-grant dataset, typical total is ~$20–30.
@@ -437,9 +442,9 @@ Per-grant cost depends on how much Stage 2 work is needed. On a ~10K-grant datas
 
 ### Didn't Work ❌
 
-- **Attribution by project `startDate`**: the original mistake. Led to ~$1.65M worth of 2013-era chitin work being attributed to 2013 despite $0 actually obligated in our 2016–2025 window.
-- **`query_used` column in hard filter rules**: the old pipeline's keyword-search results carried a `query_used` column that the filter depended on. The bulk pipeline has no such column, so those rules were rephrased to trigger on abstract text content.
-- **Keyword-based interdisciplinary flag**: noisy (too many false positives on "collaborative" as marketing language). Replaced by LLM-computed `research_approach` axis in Stage 2-Full.
+- **Attributing funding to a project's `startDate`**: a naive first approach is to sum each grant's obligation against its start date. This conflates *lifetime award value* with *year-specific spend* — a grant that started well before the analysis window and has only a single small administrative modification inside the window would count its full multi-year award against its start year, even though zero dollars were actually obligated during 2016–2025. The pipeline attributes by transaction `action_date` instead, so the year a dollar was obligated is the year it counts (see *Why this pipeline* above).
+- **Hard filters keyed on a specific search-query term**: filter rules that fire only when a particular keyword appears in a `query_used` metadata column don't survive a switch from a keyword-search API to bulk per-year archives, which have no such column. Step 2's hard filters key on abstract/title content directly, not query provenance.
+- **Keyword-based interdisciplinary detection**: flagging grants as interdisciplinary from surface keywords ("collaborative", "multidisciplinary", "integrative") produces too many false positives — funder boilerplate, broader-impacts sections, and the `Collaborative Research:` title prefix (which only signals multi-institution, not cross-discipline) all trigger without the underlying research being interdisciplinary. Replaced by the LLM's `research_approach` axis in Stage 2-Full, which evaluates the aims/methods body only.
 
 ---
 
