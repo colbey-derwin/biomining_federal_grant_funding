@@ -1,0 +1,36 @@
+# ── Raw data / generated outputs ─────────────────────────────────────────
+# Raw NSF + USASpending data — users download their own per README.
+*.csv
+*.json
+
+# Pipeline outputs — regenerated locally from the scripts.
+scripts/grant_classifier/output/
+
+# Keep Excel validation / template files (they're repo-level references).
+!*.xlsx
+
+# ── Secrets ─────────────────────────────────────────────────────────────
+.env
+
+# ── Python ──────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+
+# ── OS / editor junk ────────────────────────────────────────────────────
+.DS_Store
+.git.backup
+
+# ── Local working notes / handoff state (not for the public repo) ───────
+HANDOFF.md
+NEXT_STEPS.md
+
+# ── Per-contributor tooling settings ────────────────────────────────────
+.claude/
+
+# ── Backups and in-flight production snapshots ──────────────────────────
+*.bak
+*.prod
+
+# ── Cross-repo integration helpers (live in the viz repo) ───────────────
+scripts/build_viz_data.py
+scripts/inject_viz_data.py
