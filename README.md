@@ -157,6 +157,21 @@ python scripts/grant_classifier/step3_mining_two_stage_classifier_multiyear.py
 
 **Resume**: `RESUME = True` (default) — checkpoints every 10 batches. Re-running after a crash resumes where it left off.
 
+> ⚠️ **Clear the output files when switching between TEST_MODE and production, OR between two test runs you want isolated.** Stage 1/2 checkpoints (`stage1_mining_relevance_all_years.csv`, `stage2_formula_all_years.csv`, `stage2_full_all_years.csv`, `stage2_short_abstract_all_years.csv`) persist across runs because of `RESUME`. If you run in `TEST_MODE = True` (only the 70 holdout grants get classified), those 70 rows land in the stage1/stage2 CSVs. If you then flip `TEST_MODE = False` with `RESUME = True`, the classifier sees those 70 keys as "already done" and **skips them from the full-dataset run** — quietly inheriting the test output and leaving the rest of the ~2,800-grant pool partially classified or misaligned. Same risk going the other direction, or between two independent test runs.
+>
+> Before switching modes, wipe the checkpoints:
+> ```bash
+> rm scripts/grant_classifier/output/stage1_mining_relevance_all_years.csv \
+>    scripts/grant_classifier/output/stage1_excluded_all_years.csv \
+>    scripts/grant_classifier/output/stage1_review_all_years.csv \
+>    scripts/grant_classifier/output/stage2_formula_all_years.csv \
+>    scripts/grant_classifier/output/stage2_full_all_years.csv \
+>    scripts/grant_classifier/output/stage2_short_abstract_all_years.csv \
+>    scripts/grant_classifier/output/mining_llm_classified_all_years.csv \
+>    scripts/grant_classifier/output/two_stage_classification_log_all_years.json
+> ```
+> Leave step1/step2 outputs (`merged_all_years.csv`, `mining_filtered_all_years.csv`) alone — those are deterministic filters and don't need re-running.
+
 **Outputs**:
 - `stage1_mining_relevance_all_years.csv` — Stage 1 decisions
 - `stage1_excluded_all_years.csv` — Stage 1 REMOVEs
