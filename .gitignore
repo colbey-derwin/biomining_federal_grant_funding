@@ -24,6 +24,8 @@ __pycache__/
 HANDOFF.md
 NEXT_STEPS.md
 SYNC_TO_WORKFLOWS.md
+WORKFLOW.md
+sync_to_sarah.sh
 
 # ── Per-contributor tooling settings ────────────────────────────────────
 .claude/
