@@ -460,7 +460,11 @@ Full findings are re-computed with each run — see the PDF for current stats.
 
 - **NSF Awards API** — https://www.nsf.gov/developer/
 - **USASpending.gov bulk CSV archive** — https://www.usaspending.gov/download_center/award_data_archive
-- **Federal forward-looking dataset** (`federal_gapmap_master_future_updated_v2.csv`) — hand-curated from announced federal critical-minerals programs; used in PDF Section 3 and in the website's commitments page (as frozen aggregates).
+- **Federal forward-looking dataset** (`federal_gapmap_master_future_updated_v2.csv`) — a hand-curated record of announced federal critical-minerals funding commitments (primarily DOE, DOD, LPO, EXIM, DFC, etc.). Used in the PDF's Section 3 and in the website's `commitments.html` (as frozen aggregates in the `FUTURE_DATA` / `FUTURE_BIO` constants).
+
+  **Why manual classification.** Forward-looking federal commitments — announcements of planned programs, open solicitations, and loan/guarantee authorizations — lack the structured award records that make the historical (2016–2025) analysis automatable. Funding Opportunity Announcements (FOAs), press releases, and agency strategy documents vary widely in depth, and the same program is often described across multiple disconnected sources (the FOA itself, agency program pages, White House / OSTP briefings, congressional budget justifications). LLM classification against this material is unreliable because the signal for our taxonomy (`mining_type`, `stage`, `biological`, `orientation`) often lives in the program's surrounding context rather than in a single canonical abstract.
+
+  **How it was done.** Each entry was manually reviewed and classified by a domain expert using the same taxonomy applied to the historical dataset. Where the source announcement lacked sufficient detail, the classification was resolved by consulting the primary FOA, the issuing agency's program documentation, and agency research-priority statements in combination. Each row carries the same `mining_type`, `stage`, and `bio` fields as the historical analysis so that forward-looking and historical figures are commensurable.
 
 ---
 
