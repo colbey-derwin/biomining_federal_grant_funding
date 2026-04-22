@@ -1,7 +1,6 @@
 # Biomining Federal Grant Analysis Pipeline
 
 **Output (PDF report)**: `visualization/biomining_highlights.pdf`
-**Output (interactive site)**: `biomining-funding-viz/` (separate folder — deployed at the GapMap URL)
 
 **Goal**: Identify and characterize federal funding for **biomining research** across all agencies (NSF, DOE, DOI, EPA, USDA, DOD, etc.) from 2016–2025. Show how much funding goes to biological vs. non-biological approaches, across research stages, mining types, materials, and orientation (public-good vs. industry-facing).
 
