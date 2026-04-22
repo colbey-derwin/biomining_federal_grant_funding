@@ -297,7 +297,7 @@ biomining_federal_grant_funding/
 ## Complete Workflow
 
 ```bash
-cd ~/Desktop/biomining_federal_grant_funding
+cd ~/Desktop/Homeworld/Projects/biomining_federal_grant_funding
 
 # 1. Merge raw bulk data (slow, only rerun when raw data changes)
 python scripts/grant_classifier/step1_merge_master_multiyear.py

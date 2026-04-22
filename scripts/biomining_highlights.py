@@ -66,26 +66,19 @@ def setup_import_path():
     if script_dir is None:
         script_dir = os.getcwd()
     
-    # Prefer the new pipeline's biomining_shared.py (lives alongside this script).
-    # Fall back to the legacy GapMap copy only if the new one is missing. The
-    # legacy copy shadows the new one if it appears earlier on sys.path and
+    # biomining_shared.py lives alongside this script (scripts/biomining_shared.py).
+    # Fall back to the legacy GapMap copy only if the expected one is missing.
+    # The legacy copy shadows the new one if it appears earlier on sys.path and
     # breaks downstream imports (e.g., FEDERAL_CSV).
-    primary = os.path.expanduser("~/Desktop/biomining_federal_grant_funding/scripts")
-    legacy  = os.path.expanduser("~/Desktop/Homeworld/Projects/GapMap")
-    if os.path.exists(os.path.join(primary, "biomining_shared.py")):
-        primary_shared = primary
-    elif os.path.exists(os.path.join(script_dir, "biomining_shared.py")):
-        primary_shared = script_dir
-    else:
-        primary_shared = None
-
     paths_to_add = []
-    if primary_shared:
-        paths_to_add.append(primary_shared)
-    elif os.path.exists(os.path.join(legacy, "biomining_shared.py")):
-        paths_to_add.append(legacy)
-    if script_dir not in paths_to_add:
+    if os.path.exists(os.path.join(script_dir, "biomining_shared.py")):
         paths_to_add.append(script_dir)
+    else:
+        legacy = os.path.expanduser("~/Desktop/Homeworld/Projects/GapMap")
+        if os.path.exists(os.path.join(legacy, "biomining_shared.py")):
+            paths_to_add.append(legacy)
+        if script_dir not in paths_to_add:
+            paths_to_add.append(script_dir)
 
     # Insert in reverse so the first path ends up at sys.path[0] (highest priority).
     for path in reversed(paths_to_add):
