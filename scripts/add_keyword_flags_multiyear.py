@@ -174,6 +174,9 @@ SHARING_KEYWORDS = [
 TIER2_DISSEMINATION_TRIGGER = r"\bdisseminat\w+"
 TIER2_PROCEEDINGS_TRIGGER   = r"\bproceedings\b"
 TIER2_FREELY_AVAILABLE      = r"\bfreely\s+available\b"
+# Catches "presented at regional and national conferences" etc., where
+# adjectives sit between "at" and "conferences" so the literal Tier 1 phrase misses.
+TIER2_PRESENTED_AT_CONF     = r"\bpresent(?:ed|ing|s)?\s+at\s+(?:\w+\s+){0,4}conferences?\b"
 
 PUBLIC_SIGNALS = [
     r"\bcommunity\b", r"\bpublicly\b", r"\bbroadly\b", r"\bwidely\b",
@@ -226,6 +229,9 @@ def has_open_access_supplement(abstract) -> bool:
     if has_dissem_or_proc:
         if any(re.search(p, text, re.IGNORECASE) for p in PUBLIC_SIGNALS):
             return True
+
+    if re.search(TIER2_PRESENTED_AT_CONF, text, re.IGNORECASE):
+        return True
 
     for m in re.finditer(TIER2_FREELY_AVAILABLE, text, re.IGNORECASE):
         s, e = m.span()

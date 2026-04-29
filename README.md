@@ -33,7 +33,7 @@ Every kept grant is classified across **6 dimensions**:
 
 Plus two **post-classification keyword flags** (from `add_keyword_flags_multiyear.py`):
 - **industry_framing** — does the abstract use TEA / LCA / commercial-viability / market-analysis language? (17 keywords)
-- **open_access_sharing** — does it reference open-access / shared-facility / data-sharing / dissemination commitments? Two-tier scheme: Tier 1 single-match (39 keywords incl. open access, shared facility, data repository, open educational resources, open platform/repository, conference proceedings, present(ed) at conferences) plus Tier 2 paired logic (`disseminat\w+` or bare `proceedings` → TRUE only if paired with a public-context signal like `community` / `publicly` / `widely` / `the public`; `freely available` → TRUE only if paired with an output-noun like `tools` / `software` / `R package` within 80 chars; restrictive overrides like `member-only` force FALSE). Logic identical to climate biotech `step5_post_classification_industry_relevance_flags_multiyear.py`.
+- **open_access_sharing** — does it reference open-access / shared-facility / data-sharing / dissemination commitments? Two-tier scheme: Tier 1 single-match (39 keywords incl. open access, shared facility, data repository, open educational resources, open platform/repository, conference proceedings, present(ed) at conferences) plus Tier 2 paired logic (`disseminat\w+` or bare `proceedings` → TRUE only if paired with a public-context signal like `community` / `publicly` / `widely` / `the public`; `freely available` → TRUE only if paired with an output-noun like `tools` / `software` / `R package` within 80 chars; `present(ed|ing|s)? at <0–4 words> conferences?` → TRUE (catches "presented at regional and national conferences" where adjectives sit between "at" and the noun); restrictive overrides like `member-only` force FALSE). Logic identical to climate biotech `step5_post_classification_industry_relevance_flags_multiyear.py`.
 
 Formula grants (block allocations like BIL AML) are classified on only `biological` + `bio_subcategory` — they're flagged via `is_formula_grant` and skip full classification to save LLM cost.
 
@@ -200,7 +200,7 @@ python scripts/add_keyword_flags_multiyear.py
 
 **Section 1A filter** (LLM-kept + ≥ 92 char abstract + non-formula) then adds:
 - `industry_framing` — 17 keywords (TEA, LCA, commercial viability, etc.)
-- `open_access_sharing` — Tier 1 single-match (39 keywords: open access, shared facility, data repository, open educational resources, open platform/repository, conference proceedings, present(ed) at conferences, etc.) + Tier 2 paired logic (`disseminat\w+` / `proceedings` paired with public-context signals; `freely available` paired with an output-noun within 80 chars; restrictive overrides force FALSE). See script docstring for full pattern lists.
+- `open_access_sharing` — Tier 1 single-match (39 keywords: open access, shared facility, data repository, open educational resources, open platform/repository, conference proceedings, present(ed) at conferences, etc.) + Tier 2 paired logic (`disseminat\w+` / `proceedings` paired with public-context signals; `freely available` paired with an output-noun within 80 chars; `present(ed|ing|s)? at <0–4 words> conferences?` flexible match; restrictive overrides force FALSE). See script docstring for full pattern lists.
 
 Interdisciplinary is *not* included here — the LLM's `research_approach` axis replaces the keyword-based interdisciplinary flag.
 
