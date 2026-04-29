@@ -132,7 +132,108 @@ SHARING_KEYWORDS = [
     "multi-user facility",
     "user facility",
     "shared access",
+
+    # ─── Tier 1 additions (parallel to existing patterns; identical to
+    # climate biotech step5_post_classification_industry_relevance_flags) ───
+    # Pedagogical content
+    "open educational resource",
+    "open educational resources",
+
+    # Open platforms / repositories
+    "open platform",
+    "open repository",
+    "open repositories",
+
+    # Public dissemination phrases (single-match safe — multi-word phrases
+    # that don't generate the false positives a bare "proceedings" or
+    # "freely available" would).
+    "conference proceedings",
+    "present at conferences",
+    "presented at conferences",
+    "present at a conference",
+    "presented at a conference",
 ]
+
+
+# =============================================================================
+# OPEN ACCESS / SHARING — Tier 2 paired logic
+# =============================================================================
+# Catches dissemination / proceedings / "freely available" language that the
+# Tier 1 keyword list misses, while requiring nearby public-context signals
+# AND excluding restrictive (member-only) language. Identical to climate
+# biotech step5_post_classification_industry_relevance_flags_multiyear.py
+# so the two analyses share methodology.
+#
+# Rationale:
+#   - "disseminate" alone is ambiguous; needs a public signal nearby.
+#   - "freely available" alone matches both output-sharing ("results made
+#     freely available") AND input-resource availability ("freely available
+#     soil", "freely available WGS data"). Requires output-noun pairing.
+#   - "proceedings" alone is weak; "conference proceedings" is in Tier 1.
+
+TIER2_DISSEMINATION_TRIGGER = r"\bdisseminat\w+"
+TIER2_PROCEEDINGS_TRIGGER   = r"\bproceedings\b"
+TIER2_FREELY_AVAILABLE      = r"\bfreely\s+available\b"
+
+PUBLIC_SIGNALS = [
+    r"\bcommunity\b", r"\bpublicly\b", r"\bbroadly\b", r"\bwidely\b",
+    r"\bscientific\s+community\b", r"\bresearch\s+community\b",
+    r"\bthe\s+public\b", r"\bpublished\b", r"\bdistributed\b",
+    r"\bonline\b", r"\bopen\b",
+]
+
+RESTRICTIVE_SIGNALS = [
+    r"\bmember[-\s]?only\b", r"\bmembers\s+only\b",
+    r"\bconsortium\s+members\s+only\b",
+    r"\brestricted\s+to\b", r"\blimited\s+to\b",
+    r"\binternal\s+use\s+only\b", r"\bproprietary\b",
+]
+
+# Output-noun pairing for "freely available" (must appear within 80 chars).
+# Bare "data" deliberately excluded — too ambiguous (matches input data too,
+# e.g. "using freely available WGS data" → input, not output sharing).
+OUTPUT_NOUNS_PATTERN = (
+    r"\b(results?|findings?|datasets?|data\s+(archive|product|portal)|"
+    r"tools?|code|software|packages?|models?|protocols?|publications?|"
+    r"lectures?|kits?|videos?|training\s+materials?|platforms?|"
+    r"frameworks?|repositor\w+|databases?|R\s+packages?|"
+    r"educational\s+materials?|outputs?|deliverables?)\b"
+)
+
+
+def has_open_access_supplement(abstract) -> bool:
+    """Tier 2 paired-logic check for open_access_sharing.
+
+    Catches grants whose abstract contains explicit dissemination, proceedings,
+    or 'freely available' language that the Tier 1 SHARING_KEYWORDS list misses.
+
+    Rules:
+      - Restrictive language anywhere in the abstract → False (override).
+      - 'disseminat\\w+' or bare 'proceedings' + any public signal → True.
+      - 'freely available' + an output-noun within 80 chars → True.
+    """
+    if pd.isna(abstract):
+        return False
+    text = str(abstract)
+
+    if any(re.search(p, text, re.IGNORECASE) for p in RESTRICTIVE_SIGNALS):
+        return False
+
+    has_dissem_or_proc = bool(
+        re.search(TIER2_DISSEMINATION_TRIGGER, text, re.IGNORECASE)
+        or re.search(TIER2_PROCEEDINGS_TRIGGER, text, re.IGNORECASE)
+    )
+    if has_dissem_or_proc:
+        if any(re.search(p, text, re.IGNORECASE) for p in PUBLIC_SIGNALS):
+            return True
+
+    for m in re.finditer(TIER2_FREELY_AVAILABLE, text, re.IGNORECASE):
+        s, e = m.span()
+        ctx = text[max(0, s - 80):min(len(text), e + 80)]
+        if re.search(OUTPUT_NOUNS_PATTERN, ctx, re.IGNORECASE):
+            return True
+
+    return False
 
 
 # =============================================================================
@@ -333,7 +434,7 @@ def main():
 
     print("2. Open Access / Sharing...")
     df_filtered["open_access_sharing"] = df_filtered[COL_ABSTRACT].apply(
-        lambda x: has_keyword(x, SHARING_KEYWORDS)
+        lambda x: has_keyword(x, SHARING_KEYWORDS) or has_open_access_supplement(x)
     )
     sharing_count = int(df_filtered["open_access_sharing"].sum())
     print(f"   ✓ {sharing_count:,} grants flagged with open-access / sharing keywords")
