@@ -47,7 +47,7 @@ ID_COL = "unique_key"
 COL_KEEP          = "s1_keep"
 COL_KEEP_CONF     = "s1_confidence"
 COL_REMOVE_REASON = "s1_remove_reason"
-COL_LLM_PREFIX    = "llm_"    # llm_mining_type, llm_bio_subcategory, llm_stage, llm_orientation, llm_materials
+COL_LLM_PREFIX    = "llm_"    # llm_mining_type, llm_bio_subcategory, llm_stage, llm_orientation, llm_materials, llm_infrastructure_subtype
 
 
 # =============================================================================
@@ -281,7 +281,7 @@ HOLDOUT_LABELS = {
 # =============================================================================
 # SCORING
 # =============================================================================
-TAXONOMY_FIELDS = ["mining_type", "bio_subcategory", "stage", "orientation", "research_approach"]
+TAXONOMY_FIELDS = ["mining_type", "bio_subcategory", "stage", "orientation", "research_approach", "infrastructure_subtype"]
 
 
 def parse_materials(val):

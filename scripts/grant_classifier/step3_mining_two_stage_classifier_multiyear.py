@@ -687,12 +687,72 @@ For public_good grants, assign one of two values based ONLY on the research-desc
 
 **Key test:** Does the abstract explicitly use words like "interdisciplinary", "integration of disciplines", or "combining [field A] and [field B]" in describing THIS grant's research approach? If YES → collaborative_interdisciplinary. Otherwise → single_focus.
 
+## AXIS 7 — INFRASTRUCTURE SUBTYPE
+
+**Gate:** infrastructure_subtype applies ONLY when mining_type = infrastructure. For all other mining_type values, set infrastructure_subtype = null and skip this axis.
+
+For mining_type = infrastructure grants, assign one of seven subtypes using the following 7-way taxonomy.
+
+**Apply ALL of these rules:**
+1. Classify by the grant's PRIMARY DELIVERABLE. If the infrastructure-flavored output is just a "broader impacts" side activity of a research grant, the parent grant_type would not be infrastructure. Assume the input you receive is genuinely infrastructure; choose the subtype that fits its primary deliverable.
+2. Funding to BUILD a facility/resource and funding to OPERATE the same facility/resource go in the SAME subtype. Lifecycle stage of the funding does not change the classification.
+3. If a grant funds multiple elements (e.g., a building plus instruments), classify by the dominant element — usually the headline deliverable or the larger dollar share.
+4. **Multi-component programs that all serve a single coherent purpose go in that purpose's subtype, NOT `other`.** Example: an extension program with workshops + educational materials + demo sites + monitoring networks all serving one IPM extension goal → `community_building`. The components individually look like multiple subtypes, but together they constitute one program with a clear primary character (extension/training). Use `other` only when the components serve genuinely independent purposes with no overarching program — see the `other` definition for details.
+5. **Centers and hubs with both a physical home AND multi-institution coordination:** classify by the dominant tangible deliverable. If a specific physical building/lab/equipment at a named institution is central to the grant's delivery (e.g., "User Facility at CCRC at UGA", "regional analytical chemistry laboratory at Michigan State"), the physical home wins → `physical_facilities`. If the coordination/network is the primary deliverable and the physical home is incidental (e.g., I/UCRC across 4 universities, RCN, NSF Engines spanning industry+academia+nonprofits), → `community_building`. If a center has multiple genuinely co-equal deliverables (physical equipment + user facility + research outputs + education + community-wide standards) with no single dominant element, → `other`.
+6. The "Includes" lists are illustrative, not exhaustive. Apply the key test to grants that don't exactly match an example.
+
+**physical_facilities** — Buildings, spaces, or structures that researchers occupy or operate from. The deliverable is the space itself, not specific instruments inside it.
+- Includes: lab buildings; research centers/hubs with a physical home; greenhouses; walk-in plant growth rooms; plant phenotyping facilities; field stations; pilot fermentation/biomanufacturing facilities (the building, not the fermenters); photobioreactor facilities (the room, not the individual reactors).
+- Key test: Is the deliverable a SPACE researchers OCCUPY or OPERATE FROM?
+- Not this: a discrete instrument or piece of equipment (use `instrumentation`); a curated material collection (use `physical_repositories`); a virtual coordinating entity with no physical building (use `community_building`).
+
+**instrumentation** — Discrete equipment or hardware that researchers operate as a tool — inputs go in, data or outputs come out. Single-purpose, even if large.
+- Includes: mass spectrometers; sequencers; gas chromatographs; individual bioreactors/fermenters; individual photobioreactors; bench-top growth chambers; automated culture/screening systems; instrument suites (NSF MRI awards).
+- Key test: Is the deliverable a SPECIFIC TOOL or UNIT researchers OPERATE, performing a defined function?
+- Not this: a building or occupied space (use `physical_facilities`); software platforms or computational models (use `data_repositories`).
+
+**Disambiguating physical_facilities vs instrumentation** — apply the deliverable test: space researchers occupy → physical_facilities; tool/unit researchers operate → instrumentation. Size isn't the test — occupy vs. operate is.
+- "Construction of a pilot fermentation facility" → physical_facilities (building)
+- "Acquisition of a 100L pilot fermenter" → instrumentation (the fermenter)
+- "Greenhouse complex for plant breeding" → physical_facilities (occupied space)
+- "Bench-top plant growth chamber" → instrumentation (discrete unit)
+- "Walk-in environmental growth room" → physical_facilities (researchers occupy it)
+
+**data_repositories** — Digital collections built or maintained for community use.
+- Includes: microbial/plant/soil microbiome genome databases; biocatalyst and enzyme databases; metabolic pathway databases; synthetic biology design tools; bioprocess simulation models; LCA tools for bioproducts; climate-biotech reference datasets; software platforms; code libraries; computational models.
+- Key test: Is the deliverable a DIGITAL RESOURCE that other researchers will access or use?
+- Not this: physical materials (use `physical_repositories`); structured pedagogy (use `learning_materials`); a discrete instrument (use `instrumentation`).
+
+**physical_repositories** — Curated physical collections of biological or reference materials, built or maintained for community use.
+- Includes: microbial culture collections (e.g., ATCC, NRRL); algae and cyanobacteria culture collections; seed banks (e.g., USDA NPGS); plant tissue archives; soil/sediment sample archives; type-strain collections; certified physical reference material libraries for environmental analytes.
+- Key test: Is the deliverable a CURATED COLLECTION of physical samples that other researchers will request from?
+- Not this: digital data (use `data_repositories`); a building where research happens (use `physical_facilities`).
+
+**learning_materials** — Produced pedagogical content.
+- Includes: synthetic biology curricula; bioenergy/bioproducts training modules; bioremediation lab manuals; climate-biotech educational websites; MOOCs on biomanufacturing or microbial engineering; instructional guides; open educational resources (OER) for climate biotech.
+- Key test: Is the deliverable PEDAGOGICAL CONTENT that learners will read, watch, or work through?
+- Not this: workshops/training events (use `community_building`); reference data (use `data_repositories`).
+
+**community_building** — Multi-institution coordination, training programs, and convening activities. The deliverable is human/institutional capacity, not an artifact.
+- Includes: bioenergy/synthetic biology workshops and conferences; REUs (Research Experiences for Undergraduates) in climate biotech labs; training programs in metabolic engineering or bioremediation; multi-institution networks (e.g., bioenergy research networks, climate biotech consortia); RCN-type awards; virtual research centers and hubs (no physical home, network of researchers and institutions).
+- Key test: Is the deliverable HUMAN or INSTITUTIONAL CAPACITY built through events, training, or coordinating networks?
+- Not this: produced content artifacts (use `learning_materials`); a physical building or facility (use `physical_facilities`).
+
+**other** — Infrastructure grant whose deliverable genuinely cannot be classified under any of the six specific subtypes above.
+- Use when: (a) the grant looks borderline-deployment (community-scale implementation of established practice rather than building a tool/facility for others); (b) the deliverable genuinely spans multiple subtypes with NO single dominant element AND the components do NOT all serve one coherent program (a center that is simultaneously a research producer, equipment provider, training program, user facility, and standards body with all elements equally weighted); or (c) it's an unusual infrastructure case that doesn't match any of the 6 patterns.
+- Key test: After applying each of the 6 specific subtype tests honestly, AND after asking "do the multiple components all serve one coherent overarching program?", is the deliverable still a poor fit for all 6?
+- IMPORTANT — do NOT use `other` when:
+  - The grant has multiple components but they all serve one coherent program (e.g., extension program → `community_building`; research center with a clear physical anchor → `physical_facilities`).
+  - One of the 6 subtypes fits even imperfectly. Pick the closest fit before resorting to `other`.
+  - The grant has just two or three component types — `other` is for genuinely irreducible multi-deliverable cases.
+- Note: choosing `other` is a useful signal — these grants warrant a closer look (often indicates an upstream `grant_type` edge case or a true integrated multi-deliverable program). It should be RARE — most infrastructure grants will fit one of the 6 specific subtypes after careful reading.
+
 ## OUTPUT FORMAT
 
 Return ONLY a valid JSON array — no preamble, no explanation, no markdown fences.
 One object per grant, in the same order as input.
 
-CRITICAL COMPLETENESS RULE: For every grant, mining_type, stage, and orientation must be non-null. research_approach must be non-null when orientation=public_good and must be null when orientation=industry_facing. A classification with null mining_type or null stage is an error. If you are uncertain about mining_type but the grant is clearly mining-relevant, make your best call and use confidence:medium rather than leaving the field null.
+CRITICAL COMPLETENESS RULE: For every grant, mining_type, stage, and orientation must be non-null. research_approach must be non-null when orientation=public_good and must be null when orientation=industry_facing. infrastructure_subtype must be non-null when mining_type=infrastructure and must be null otherwise. A classification with null mining_type or null stage is an error. If you are uncertain about mining_type but the grant is clearly mining-relevant, make your best call and use confidence:medium rather than leaving the field null.
 
 [
   {
@@ -704,7 +764,8 @@ CRITICAL COMPLETENESS RULE: For every grant, mining_type, stage, and orientation
     "materials": [array of material tags],
     "stage": one of [fundamental, early_technology_development, applied_translational, deployment],
     "orientation": "public_good" or "industry_facing",
-    "research_approach": "collaborative_interdisciplinary" | "single_focus" | null  (must be null when orientation=industry_facing)
+    "research_approach": "collaborative_interdisciplinary" | "single_focus" | null  (must be null when orientation=industry_facing),
+    "infrastructure_subtype": "physical_facilities" | "instrumentation" | "data_repositories" | "physical_repositories" | "learning_materials" | "community_building" | "other" | null  (must be null when mining_type != infrastructure)
   }
 ]
 
@@ -1076,11 +1137,12 @@ def apply_stage2_formula_results(df, results_dict):
             df.at[idx, "llm_bio_subcategory"] = r.get("bio_subcategory")
             df.at[idx, "llm_confidence"]      = r.get("confidence", "low")
             # Static axes for formula grants (block allocations — deployment, not research)
-            df.at[idx, "llm_mining_type"]       = "remediation"
-            df.at[idx, "llm_stage"]             = "deployment"
-            df.at[idx, "llm_materials"]         = json.dumps(["polymetallic_general"])
-            df.at[idx, "llm_orientation"]       = "public_good"
-            df.at[idx, "llm_research_approach"] = None
+            df.at[idx, "llm_mining_type"]            = "remediation"
+            df.at[idx, "llm_stage"]                  = "deployment"
+            df.at[idx, "llm_materials"]              = json.dumps(["polymetallic_general"])
+            df.at[idx, "llm_orientation"]            = "public_good"
+            df.at[idx, "llm_research_approach"]      = None
+            df.at[idx, "llm_infrastructure_subtype"] = None
 
 
 # =============================================================================
@@ -1125,11 +1187,12 @@ def apply_stage2_short_results(df, results_dict):
             df.at[idx, "llm_bio_subcategory"] = r.get("bio_subcategory")
             df.at[idx, "llm_confidence"]      = r.get("confidence", "low")
             # Other axes remain None — not determinable from a short abstract.
-            df.at[idx, "llm_mining_type"]       = None
-            df.at[idx, "llm_stage"]             = None
-            df.at[idx, "llm_materials"]         = None
-            df.at[idx, "llm_orientation"]       = None
-            df.at[idx, "llm_research_approach"] = None
+            df.at[idx, "llm_mining_type"]            = None
+            df.at[idx, "llm_stage"]                  = None
+            df.at[idx, "llm_materials"]              = None
+            df.at[idx, "llm_orientation"]            = None
+            df.at[idx, "llm_research_approach"]      = None
+            df.at[idx, "llm_infrastructure_subtype"] = None
 
 
 # =============================================================================
@@ -1162,6 +1225,7 @@ def classify_stage2_full_batch(client, batch):
                          "mining_type": None, "materials": [],
                          "stage": None, "orientation": None,
                          "research_approach": None,
+                         "infrastructure_subtype": None,
                          "confidence": "low"} for r in batch], str(e)
 
 
@@ -1170,15 +1234,16 @@ def apply_stage2_full_results(df, results_dict):
         gid = str(row.get("unique_key", "")).strip()
         if gid in results_dict:
             r = results_dict[gid]
-            df.at[idx, "llm_biological"]         = bool(r.get("biological", False))
-            df.at[idx, "llm_bio_subcategory"]    = r.get("bio_subcategory")
-            df.at[idx, "llm_mining_type"]        = r.get("mining_type")
+            df.at[idx, "llm_biological"]            = bool(r.get("biological", False))
+            df.at[idx, "llm_bio_subcategory"]       = r.get("bio_subcategory")
+            df.at[idx, "llm_mining_type"]           = r.get("mining_type")
             materials = r.get("materials", []) or []
-            df.at[idx, "llm_materials"]          = json.dumps(materials) if isinstance(materials, list) else str(materials)
-            df.at[idx, "llm_stage"]              = r.get("stage")
-            df.at[idx, "llm_orientation"]        = r.get("orientation")
-            df.at[idx, "llm_research_approach"]  = r.get("research_approach")
-            df.at[idx, "llm_confidence"]         = r.get("confidence", "low")
+            df.at[idx, "llm_materials"]             = json.dumps(materials) if isinstance(materials, list) else str(materials)
+            df.at[idx, "llm_stage"]                 = r.get("stage")
+            df.at[idx, "llm_orientation"]           = r.get("orientation")
+            df.at[idx, "llm_research_approach"]     = r.get("research_approach")
+            df.at[idx, "llm_infrastructure_subtype"] = r.get("infrastructure_subtype")
+            df.at[idx, "llm_confidence"]            = r.get("confidence", "low")
 
 
 # =============================================================================
@@ -1213,7 +1278,8 @@ def main():
         "llm_biological", "llm_bio_subcategory",
         "llm_mining_type", "llm_materials",
         "llm_stage", "llm_orientation",
-        "llm_research_approach", "llm_confidence",
+        "llm_research_approach", "llm_infrastructure_subtype",
+        "llm_confidence",
     ]
     for col in s2_cols:
         if col not in df.columns:
@@ -1408,7 +1474,8 @@ def main():
         # Seed llm_* cols so apply_stage2_short_results can write to them.
         for col in ("llm_biological", "llm_bio_subcategory", "llm_confidence",
                     "llm_mining_type", "llm_stage", "llm_materials",
-                    "llm_orientation", "llm_research_approach"):
+                    "llm_orientation", "llm_research_approach",
+                    "llm_infrastructure_subtype"):
             if col not in df_short.columns:
                 df_short[col] = None
 
