@@ -60,7 +60,7 @@ BENCHMARK_ABSTRACT_LENGTH = 92
 # KEYWORD LISTS — verbatim from old biomining pipeline
 # =============================================================================
 
-# INDUSTRY FRAMING KEYWORDS — 17 total
+# INDUSTRY FRAMING KEYWORDS — 18 total
 INDUSTRY_KEYWORDS = [
     # Techno-economic analysis
     "techno-economic analysis",
@@ -90,6 +90,9 @@ INDUSTRY_KEYWORDS = [
     "scale-up economics",
     "market analysis",
     "market potential",
+
+    # Technology transfer (STTR/SBIR program framing) — parity with climate biotech (2026-05-19)
+    "technology transfer",
 ]
 
 # OPEN ACCESS / SHARING KEYWORDS — 29 total
